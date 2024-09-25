@@ -1,5 +1,1 @@
-Flask
-XGBoost
-pandas
-numpy
-scikit-learn
+your_requirements_here
