@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='apple-touch-icon.png') }}">
+    <meta charset="UTF-8">
+    <title>Crop Price Predictor</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f5f5f5; }
+        .container { max-width: 500px; margin: 50px auto; background: #fff; padding: 20px; border-radius: 5px; }
+        h2 { text-align: center; }
+        label { display: block; margin-bottom: 5px; }
+        input[type="text"] { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { width: 100%; padding: 10px; background-color: #28a745; color: #fff; border: none; }
+        .result { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Crop Price Predictor</h2>
+        <form id="predict-form">
+            <label for="commodity">Enter Commodity Name:</label>
+            <input type="text" id="commodity" name="commodity" placeholder="e.g., Cabbage" required>
+            <button type="submit">Predict Price</button>
+        </form>
+        <div class="result" id="result"></div>
+    </div>
+
+    <script>
+        document.getElementById('predict-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const commodity = document.getElementById('commodity').value;
+
+            fetch('/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: `commodity=${encodeURIComponent(commodity)}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById('result').innerHTML = `<p style="color:red;">${data.error}</p>`;
+                } else {
+                    document.getElementById('result').innerHTML = `
+                        <h3>Predicted Price for ${data.commodity}:</h3>
+                        <p>Price: ₹${data.predicted_price}</p>
+                        <p>Date: ${data.date}</p>
+                        <p>Location: ${data.location}</p>
+                    `;
+                }
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = `<p style="color:red;">An error occurred.</p>`;
+                console.error('Error:', error);
+            });
+        });
+    </script>
+</body>
+</html>
